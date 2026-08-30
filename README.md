@@ -24,7 +24,7 @@ The database contains these tables:
 
 ## Schema Diagram
 
-![Music Store Database Schema](images/schema_diagram.png)
+![Music Store Database Schema]
 
 ## Tools Used
 
