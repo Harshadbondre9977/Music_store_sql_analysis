@@ -1,0 +1,54 @@
+--Query 11 — Customers from each country
+SELECT 
+    country,
+    COUNT(*) AS customer_count
+FROM customer
+GROUP BY country
+ORDER BY customer_count DESC;
+
+--Query 12 — Customers from USA
+SELECT 
+    customer_id,
+    first_name,
+    last_name,
+    email
+FROM customer
+WHERE country = 'USA';
+
+--Query 13 — Customers with their support representative
+SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    e.first_name AS employee_first_name,
+    e.last_name AS employee_last_name
+FROM customer c
+JOIN employee e
+    ON c.support_rep_id = e.employee_id;
+	
+--Query 14 — Top 10 customers by spending
+SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    SUM(i.total) AS total_spending
+FROM customer c
+JOIN invoice i
+    ON c.customer_id = i.customer_id
+GROUP BY 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY total_spending DESC
+LIMIT 10;
+
+--Query 15 — Average customer spending
+SELECT
+    AVG(total_spending) AS average_customer_spending
+FROM (
+    SELECT
+        customer_id,
+        SUM(total) AS total_spending
+    FROM invoice
+    GROUP BY customer_id
+) AS customer_totals;
