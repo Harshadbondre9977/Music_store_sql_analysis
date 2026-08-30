@@ -1,0 +1,70 @@
+--Query 29 — Top 10 best-selling tracks
+SELECT
+    t.name AS track,
+    SUM(il.quantity) AS units_sold
+FROM track t
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY t.name
+ORDER BY units_sold DESC
+LIMIT 10;
+--Query 30 — Top 10 tracks by revenue
+SELECT
+    t.name AS track,
+    SUM(il.quantity * il.unit_price) AS revenue
+FROM track t
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY t.name
+ORDER BY revenue DESC
+LIMIT 10;
+--Query 31 — Best-selling artists
+SELECT
+    ar.name AS artist,
+    SUM(il.quantity) AS units_sold
+FROM artist ar
+JOIN album a
+    ON ar.artist_id = a.artist_id
+JOIN track t
+    ON a.album_id = t.album_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY ar.name
+ORDER BY units_sold DESC
+LIMIT 10;
+--Query 32 — Artists generating the most revenue
+SELECT
+    ar.name AS artist,
+    SUM(il.quantity * il.unit_price) AS revenue
+FROM artist ar
+JOIN album a
+    ON ar.artist_id = a.artist_id
+JOIN track t
+    ON a.album_id = t.album_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY ar.name
+ORDER BY revenue DESC
+LIMIT 10;
+--Query 33 — Best-selling genres
+SELECT
+    g.name AS genre,
+    SUM(il.quantity) AS units_sold
+FROM genre g
+JOIN track t
+    ON g.genre_id = t.genre_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY units_sold DESC;
+--Query 34 — Genres generating the most revenue
+SELECT
+    g.name AS genre,
+    SUM(il.quantity * il.unit_price) AS revenue
+FROM genre g
+JOIN track t
+    ON g.genre_id = t.genre_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY revenue DESC;
