@@ -1,0 +1,19 @@
+--Query 38 — Number of tracks in each playlist
+SELECT
+    p.name AS playlist,
+    COUNT(pt.track_id) AS track_count
+FROM playlist p
+JOIN playlist_track pt
+    ON p.playlist_id = pt.playlist_id
+GROUP BY p.name
+ORDER BY track_count DESC;
+--Query 39 — Tracks in a playlist
+SELECT
+    p.name AS playlist,
+    t.name AS track
+FROM playlist p
+JOIN playlist_track pt
+    ON p.playlist_id = pt.playlist_id
+JOIN track t
+    ON pt.track_id = t.track_id
+ORDER BY p.name, t.name;
