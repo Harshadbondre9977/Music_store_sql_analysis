@@ -1,0 +1,41 @@
+--Query 16 — Total revenue
+SELECT
+    SUM(total) AS total_revenue
+FROM invoice;
+--Query 17 — Average invoice value
+SELECT
+    AVG(total) AS average_invoice_value
+FROM invoice;
+--Query 18 — Number of invoices
+SELECT
+    COUNT(*) AS total_invoices
+FROM invoice;
+--Query 19 — Revenue by country
+SELECT
+    billing_country,
+    SUM(total) AS total_revenue
+FROM invoice
+GROUP BY billing_country
+ORDER BY total_revenue DESC;
+--Query 20 — Top 10 countries by revenue
+SELECT
+    billing_country,
+    SUM(total) AS total_revenue
+FROM invoice
+GROUP BY billing_country
+ORDER BY total_revenue DESC
+LIMIT 10;
+--Query 21 — Monthly revenue
+SELECT
+    DATE_TRUNC('month', invoice_date) AS month,
+    SUM(total) AS monthly_revenue
+FROM invoice
+GROUP BY month
+ORDER BY month;
+--Query 22 — Yearly revenue
+SELECT
+    EXTRACT(YEAR FROM invoice_date) AS year,
+    SUM(total) AS yearly_revenue
+FROM invoice
+GROUP BY year
+ORDER BY year;
