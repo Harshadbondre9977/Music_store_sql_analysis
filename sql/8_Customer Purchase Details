@@ -1,0 +1,36 @@
+--Query 40 — Customer purchase history
+SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    i.invoice_id,
+    i.invoice_date,
+    i.total
+FROM customer c
+JOIN invoice i
+    ON c.customer_id = i.customer_id
+ORDER BY c.customer_id, i.invoice_date;
+--Query 41 — Customer with total number of purchases
+SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(i.invoice_id) AS purchase_count
+FROM customer c
+LEFT JOIN invoice i
+    ON c.customer_id = i.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY purchase_count DESC;
+--Query 42 — Customer spending by country
+SELECT
+    c.country,
+    COUNT(DISTINCT c.customer_id) AS customers,
+    SUM(i.total) AS revenue
+FROM customer c
+JOIN invoice i
+    ON c.customer_id = i.customer_id
+GROUP BY c.country
+ORDER BY revenue DESC;
