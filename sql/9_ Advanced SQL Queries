@@ -1,0 +1,139 @@
+--Query 43 — Rank customers by spending
+SELECT
+    customer_id,
+    first_name,
+    last_name,
+    total_spending,
+    RANK() OVER (ORDER BY total_spending DESC) AS spending_rank
+FROM (
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        SUM(i.total) AS total_spending
+    FROM customer c
+    JOIN invoice i
+        ON c.customer_id = i.customer_id
+    GROUP BY
+        c.customer_id,
+        c.first_name,
+        c.last_name
+) AS customer_sales;
+
+--Query 44 — Top customer in each country
+WITH customer_sales AS (
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        c.country,
+        SUM(i.total) AS total_spending
+    FROM customer c
+    JOIN invoice i
+        ON c.customer_id = i.customer_id
+    GROUP BY
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        c.country
+),
+ranked_customers AS (
+    SELECT
+        *,
+        RANK() OVER (
+            PARTITION BY country
+            ORDER BY total_spending DESC
+        ) AS ranking
+    FROM customer_sales
+)
+SELECT *
+FROM ranked_customers
+WHERE ranking = 1
+ORDER BY country;
+
+--Query 45 — Revenue percentage by country
+SELECT
+    billing_country,
+    SUM(total) AS revenue,
+    ROUND(
+        SUM(total) * 100.0 /
+        SUM(SUM(total)) OVER (),
+        2
+    ) AS revenue_percentage
+FROM invoice
+GROUP BY billing_country
+ORDER BY revenue DESC;
+
+--Query 46 — Running monthly revenue
+WITH monthly_sales AS (
+    SELECT
+        DATE_TRUNC('month', invoice_date) AS month,
+        SUM(total) AS revenue
+    FROM invoice
+    GROUP BY month
+)
+SELECT
+    month,
+    revenue,
+    SUM(revenue) OVER (
+        ORDER BY month
+    ) AS running_revenue
+FROM monthly_sales
+ORDER BY month;
+
+--Query 47 — Customers spending above average
+WITH customer_sales AS (
+    SELECT
+        customer_id,
+        SUM(total) AS total_spending
+    FROM invoice
+    GROUP BY customer_id
+)
+SELECT
+    customer_id,
+    total_spending
+FROM customer_sales
+WHERE total_spending > (
+    SELECT AVG(total_spending)
+    FROM customer_sales
+)
+ORDER BY total_spending DESC;
+
+--Query 48 — Most popular genre by sales
+SELECT
+    g.name AS genre,
+    SUM(il.quantity) AS units_sold
+FROM genre g
+JOIN track t
+    ON g.genre_id = t.genre_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY units_sold DESC
+LIMIT 1;
+
+--Query 49 — Album revenue
+SELECT
+    a.title AS album,
+    ar.name AS artist,
+    SUM(il.quantity * il.unit_price) AS revenue
+FROM album a
+JOIN artist ar
+    ON a.artist_id = ar.artist_id
+JOIN track t
+    ON a.album_id = t.album_id
+JOIN invoice_line il
+    ON t.track_id = il.track_id
+GROUP BY a.title, ar.name
+ORDER BY revenue DESC;
+
+--Query 50 — Identify customers who never purchased
+SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    c.email
+FROM customer c
+LEFT JOIN invoice i
+    ON c.customer_id = i.customer_id
+WHERE i.invoice_id IS NULL;
